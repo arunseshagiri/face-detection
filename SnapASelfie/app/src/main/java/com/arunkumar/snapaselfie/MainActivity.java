@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -19,12 +20,13 @@ import com.google.android.gms.vision.face.FaceDetector;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetection {
 
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
     private CameraSource cameraSource;
     private SurfaceView surfaceView;
+    private View faceFrame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         surfaceView = findViewById(R.id.preview);
+        faceFrame = findViewById(R.id.face_frame);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
@@ -58,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .build();
 
-        detector.setProcessor(new MultiProcessor.Builder<>(new FaceTrackerFactory()).build());
+        detector.setProcessor(new MultiProcessor.Builder<>(new FaceTrackerFactory(this)).build());
 
         cameraSource = new CameraSource.Builder(this, detector)
                 .setFacing(CameraSource.CAMERA_FACING_FRONT)
@@ -104,5 +107,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         cameraSource.release();
+    }
+
+    @Override
+    public void onFaceDetected(boolean faceCaptured) {
+        if (faceCaptured) {
+            faceFrame.setBackground(ContextCompat.getDrawable(this, R.drawable.frame_face_detected));
+        } else {
+            faceFrame.setBackground(ContextCompat.getDrawable(this, R.drawable.frame_face));
+        }
     }
 }

@@ -8,7 +8,10 @@ import com.google.android.gms.vision.face.FaceDetector;
 
 public class FaceTracker extends Tracker<Face> {
 
-    public FaceTracker() {
+    private UpdateUIFaceDetection detection;
+
+    public FaceTracker(UpdateUIFaceDetection detection) {
+        this.detection = detection;
     }
 
     @Override
@@ -18,6 +21,11 @@ public class FaceTracker extends Tracker<Face> {
 
     @Override
     public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
+        if (face.getWidth() > 700 && face.getWidth() < 800) {
+            detection.onFaceDetected(true);
+        } else {
+            detection.onFaceDetected(false);
+        }
     }
 
     @Override
