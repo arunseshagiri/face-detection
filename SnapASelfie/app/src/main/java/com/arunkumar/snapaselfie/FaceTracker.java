@@ -30,7 +30,7 @@ public class FaceTracker extends Tracker<Face> {
 
     @Override
     public void onMissing(FaceDetector.Detections<Face> detectionResults) {
-
+        detection.onFaceDetected(false);
     }
 
     @Override

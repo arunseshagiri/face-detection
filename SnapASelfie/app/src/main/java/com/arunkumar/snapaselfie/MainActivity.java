@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -30,7 +31,7 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetection, View.OnClickListener {
 
-    private static final int REQUEST_CAMERA_PERMISSION = 1;
+    private static final int REQUEST_PERMISSION = 1;
 
     private CameraSource cameraSource;
     private SurfaceView surfaceView;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
                                     Manifest.permission.READ_EXTERNAL_STORAGE,
                                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                             },
-                            REQUEST_CAMERA_PERMISSION
+                            REQUEST_PERMISSION
                     );
         } else {
             createCameraSource();
@@ -74,8 +75,10 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CAMERA_PERMISSION && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_PERMISSION && resultCode == RESULT_OK) {
             createCameraSource();
+        } else {
+            Toast.makeText(this, "Permission needed to proceed", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -141,8 +144,10 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
     @Override
     public void onFaceDetected(boolean faceCaptured) {
         if (faceCaptured) {
+            takePicture.setEnabled(true);
             faceFrame.setBackground(ContextCompat.getDrawable(this, R.drawable.frame_face_detected));
         } else {
+            takePicture.setEnabled(false);
             faceFrame.setBackground(ContextCompat.getDrawable(this, R.drawable.frame_face));
         }
     }
