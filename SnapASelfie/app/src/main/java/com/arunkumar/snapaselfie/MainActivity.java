@@ -2,6 +2,7 @@ package com.arunkumar.snapaselfie;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
     private SurfaceView surfaceView;
     private View faceFrame;
     private Button takePicture;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,10 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
         faceFrame = findViewById(R.id.face_frame);
         takePicture = findViewById(R.id.take_picture);
         takePicture.setOnClickListener(this);
+
+        dialog = new ProgressDialog(MainActivity.this);
+        dialog.setMessage("Saving captured image...");
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -99,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
             width = height;
             height = width;
         }
-
         Log.d("", "**** Metrics Preview width and height=" + width + " " + height);
         cameraSource = new CameraSource.Builder(this, detector)
                 .setRequestedPreviewSize(width, height)
@@ -161,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
 
     @Override
     public void onClick(View view) {
+        dialog.show();
         cameraSource.takePicture(null, new CameraSource.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] byteArr) {
@@ -170,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
                         .setFileName("capture_image")
                         .withExtension(Extension.PNG)
                         .save(bitmap, 85);
-
+                dialog.dismiss();
                 startActivity(new Intent(getApplicationContext(), ShowCaptureActivity.class));
             }
         });
