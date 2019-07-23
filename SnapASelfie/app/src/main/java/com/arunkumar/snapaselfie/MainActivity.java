@@ -30,6 +30,8 @@ import com.himanshurawat.imageworker.ImageWorker;
 
 import java.io.IOException;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
 public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetection, View.OnClickListener {
 
     private static final int REQUEST_PERMISSION = 1;
@@ -80,9 +82,18 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_PERMISSION && resultCode == RESULT_OK) {
-            createCameraSource();
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        boolean granted = false;
+        if (requestCode == REQUEST_PERMISSION) {
+            for (int result : grantResults) {
+                if (result == PERMISSION_GRANTED) {
+                    granted = true;
+                }
+            }
+
+            if (granted) {
+                createCameraSource();
+            }
         } else {
             Toast.makeText(this, "Permission needed to proceed", Toast.LENGTH_LONG).show();
         }
@@ -103,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
         if (width < height) {
             int temp = width;
             width = height;
-            height = width;
+            height = temp;
         }
         Log.d("", "**** Metrics Preview width and height=" + width + " " + height);
         cameraSource = new CameraSource.Builder(this, detector)
@@ -134,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
 
                         @Override
                         public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
+                            cameraSource.release();
                         }
                     }
             );
@@ -144,13 +155,17 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
     @Override
     protected void onStop() {
         super.onStop();
-        cameraSource.stop();
+        if (cameraSource != null) {
+            cameraSource.stop();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        cameraSource.release();
+        if (cameraSource != null) {
+            cameraSource.release();
+        }
     }
 
     @Override
