@@ -21,7 +21,7 @@ public class FaceTracker extends Tracker<Face> {
 
     @Override
     public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
-        if (face.getWidth() > 700 && face.getWidth() < 800) {
+        if (face.getWidth() > 900 && face.getWidth() < 1000) {
             detection.onFaceDetected(true);
         } else {
             detection.onFaceDetected(false);

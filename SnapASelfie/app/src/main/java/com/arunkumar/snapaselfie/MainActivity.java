@@ -93,6 +93,13 @@ public class MainActivity extends AppCompatActivity implements UpdateUIFaceDetec
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
+
+        if (width < height) {
+            int temp = width;
+            width = height;
+            height = width;
+        }
+
         Log.d("", "**** Metrics Preview width and height=" + width + " " + height);
         cameraSource = new CameraSource.Builder(this, detector)
                 .setRequestedPreviewSize(width, height)
